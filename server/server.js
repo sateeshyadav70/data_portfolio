@@ -22,7 +22,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/portfolio', {
+const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+if (!mongoUri) {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('MongoDB URI missing. Set MONGODB_URI in environment variables.');
+    process.exit(1);
+  } else {
+    console.warn('MONGODB_URI not set. Falling back to local MongoDB instance.');
+  }
+}
+
+mongoose.connect(mongoUri || 'mongodb://localhost:27017/portfolio', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
